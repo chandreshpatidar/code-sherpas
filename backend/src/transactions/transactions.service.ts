@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Transaction } from '@prisma/client';
 
 @Injectable()
@@ -94,6 +94,18 @@ export class TransactionService {
 
     if (!fromAccount || !toAccount) {
       throw new BadRequestException('One or both accounts do not exist.');
+    }
+
+    if (fromAccount.id === toAccount.id) {
+      throw new BadRequestException(
+        'Transfer can not be made to the same account. The source and destination accounts cannot be the same.',
+      );
+    }
+
+    if (fromAccount.type !== 'IBAN' || toAccount.type !== 'IBAN') {
+      throw new BadRequestException(
+        'One or both accounts are not IBAN accounts.',
+      );
     }
 
     if (fromAccount.balance < amount) {
