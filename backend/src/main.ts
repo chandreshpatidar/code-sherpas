@@ -14,6 +14,16 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  let port = 3333;
+  try {
+    const newPort = parseInt(process.env.PORT, 10);
+    if (!isNaN(newPort)) {
+      port = newPort;
+    }
+  } catch (error) {
+    console.error('Invalid PORT environment variable');
+  }
+
+  await app.listen(port);
 }
 bootstrap();
