@@ -1,6 +1,20 @@
-import { Controller, Post, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Get,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { TransactionService } from './transactions.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { Transaction } from '@prisma/client'; // Prisma-generated types
 import { DepositDto, TransferDto, WithdrawDto } from './dto/transaction.dto';
 
@@ -9,6 +23,22 @@ import { DepositDto, TransferDto, WithdrawDto } from './dto/transaction.dto';
 @Controller('accounts/:accountId')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
+
+  @Get('history')
+  @ApiOperation({ summary: 'Get transaction history of an account' })
+  @ApiQuery({ name: 'limit', type: 'number', example: 30 })
+  @ApiQuery({ name: 'cursor', type: 'string', required: false })
+  async getTransactionHistory(
+    @Param('accountId') accountId: string,
+    @Query('limit', ParseIntPipe) limit: number = 30,
+    @Query('cursor') cursor?: string,
+  ) {
+    return this.transactionService.getTransactionHistory(
+      accountId,
+      limit,
+      cursor,
+    );
+  }
 
   @Post('deposit')
   @ApiOperation({ summary: 'Deposit money into an account' })

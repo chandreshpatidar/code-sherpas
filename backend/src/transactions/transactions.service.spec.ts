@@ -10,6 +10,7 @@ interface PrismaMock {
   };
   transaction: {
     create: jest.Mock;
+    findMany: jest.Mock;
   };
   $transaction: jest.Mock;
 }
@@ -54,6 +55,7 @@ describe('TransactionService', () => {
     },
     transaction: {
       create: jest.fn(),
+      findMany: jest.fn(),
     },
     $transaction: jest.fn(),
   };
@@ -247,6 +249,34 @@ describe('TransactionService', () => {
       await expect(
         service.transfer('account1', 'account2', 500),
       ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('history', () => {
+    it('should return paginated transaction history with a nextCursor', async () => {
+      prismaMock.transaction.findMany.mockResolvedValue([
+        { id: 'txn1', createdAt: new Date() },
+        { id: 'txn2', createdAt: new Date() },
+        { id: 'txn3', createdAt: new Date() },
+      ]);
+
+      const result = await service.getTransactionHistory('accountId', 2);
+
+      expect(result).toEqual({
+        transactions: [
+          { id: 'txn1', createdAt: expect.any(Date) },
+          { id: 'txn2', createdAt: expect.any(Date) },
+        ],
+        nextCursor: 'txn3',
+      });
+    });
+
+    it('should return empty results if no transactions exist', async () => {
+      prismaMock.transaction.findMany.mockResolvedValue([]);
+
+      const result = await service.getTransactionHistory('accountId', 2);
+
+      expect(result).toEqual({ transactions: [], nextCursor: null });
     });
   });
 });

@@ -3,12 +3,41 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { Transaction } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TransactionService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async getTransactionHistory(
+    accountId: string,
+    limit: number,
+    cursor?: string,
+  ): Promise<{ transactions: Transaction[]; nextCursor?: string }> {
+    if (limit <= 0) {
+      throw new NotFoundException('Limit must be greater than 0.');
+    }
+
+    const transactions = await this.prisma.transaction.findMany({
+      where: { account_id: accountId },
+      orderBy: { created_at: 'desc' },
+      take: limit + 1,
+      ...(cursor
+        ? {
+            cursor: { id: cursor },
+          }
+        : {}),
+    });
+
+    let nextCursor: string | undefined = null;
+    if (transactions.length > limit) {
+      nextCursor = transactions[limit].id;
+      transactions.pop();
+    }
+
+    return { transactions, nextCursor };
+  }
 
   async deposit(accountId: string, amount: number): Promise<Transaction> {
     if (amount <= 0) {
