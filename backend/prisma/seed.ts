@@ -60,6 +60,14 @@ async function main() {
         owner_id: 'user3',
         created_at: new Date(),
       },
+      {
+        id: 'acc5',
+        iban: null,
+        type: 'IBAN',
+        balance: 3500,
+        owner_id: 'user1',
+        created_at: new Date(),
+      },
     ],
   });
 
