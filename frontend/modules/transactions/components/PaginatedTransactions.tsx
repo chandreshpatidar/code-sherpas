@@ -31,6 +31,10 @@ export const PaginatedTransactions = () => {
         <div className='text-end'>Balance</div>
       </div>
 
+      {paginatedTransaction.transactions?.length === 0 && (
+        <p className='text-center text-muted-foreground'>No transactions found</p>
+      )}
+
       <List
         height={400}
         itemCount={paginatedTransaction.transactions.length}

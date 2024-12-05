@@ -38,6 +38,10 @@ export const RecentTransactions = () => {
               <div className='text-end'>Balance</div>
             </div>
 
+            {paginatedTransaction.transactions?.length === 0 && (
+              <p className='text-center text-muted-foreground'>No transactions found</p>
+            )}
+
             {paginatedTransaction.transactions?.slice(0, 5)?.map((transaction, index) => (
               <TransactionItem
                 key={index}
