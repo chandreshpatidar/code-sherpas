@@ -1,6 +1,6 @@
 import { HTMLInputTypeAttribute } from 'react';
 
-export interface FormikInputFieldProp {
+export interface FormikInputFieldProp extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   name: string;
   labelClassName?: string;
