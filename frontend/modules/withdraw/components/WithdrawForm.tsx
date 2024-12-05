@@ -4,7 +4,6 @@ import { Form, Formik, FormikValues } from 'formik';
 import FormikInput from '@/components/formik/FormikInput';
 import { Button } from '@/components/ui/button';
 import { withdrawFormValidationSchema } from '../validations/withdrawFormValidationSchema';
-import { WithdrawMoneyInput } from '@/modules/account/types';
 import { useAccountStore } from '@/modules/account/store/accountStore';
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,7 +17,8 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({ onCancel, onSuccess 
   const { showSuccessToast, showErrorToast } = useToast();
 
   const onSubmit = async (values: FormikValues) => {
-    const error = await withdraw({ amount: Number(values.amount) } as WithdrawMoneyInput);
+    const body = { amount: Number(values.amount) };
+    const error = await withdraw(body);
 
     if (error?.message) {
       showErrorToast(error.message);
@@ -33,7 +33,6 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({ onCancel, onSuccess 
       validationSchema={withdrawFormValidationSchema}
       initialValues={{
         amount: '',
-        message: '',
       }}
       onSubmit={(values) => onSubmit(values)}
     >
@@ -47,11 +46,6 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({ onCancel, onSuccess 
             placeholder='0'
           />
         </div>
-
-        <FormikInput
-          name='message'
-          label='Message'
-        />
 
         <div className='mt-10 w-full flex gap-6'>
           <Button

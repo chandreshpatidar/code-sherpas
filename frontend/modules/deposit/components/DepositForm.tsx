@@ -5,7 +5,6 @@ import FormikInput from '@/components/formik/FormikInput';
 import { Button } from '@/components/ui/button';
 import { depositFormValidationSchema } from '../validations/depositFormValidationSchema';
 import { useAccountStore } from '@/modules/account/store/accountStore';
-import { DepositMoneyInput } from '@/modules/account/types';
 import { useToast } from '@/hooks/use-toast';
 
 interface DepositFormProps {
@@ -18,7 +17,8 @@ export const DepositForm: React.FC<DepositFormProps> = ({ onCancel, onSuccess })
   const { showSuccessToast, showErrorToast } = useToast();
 
   const onSubmit = async (values: FormikValues) => {
-    const error = await deposit({ amount: Number(values.amount) } as DepositMoneyInput);
+    const body = { amount: Number(values.amount) };
+    const error = await deposit(body);
 
     if (error?.message) {
       showErrorToast(error.message);
@@ -33,7 +33,6 @@ export const DepositForm: React.FC<DepositFormProps> = ({ onCancel, onSuccess })
       validationSchema={depositFormValidationSchema}
       initialValues={{
         amount: '',
-        // message: '',
       }}
       onSubmit={(values) => onSubmit(values)}
     >
@@ -47,11 +46,6 @@ export const DepositForm: React.FC<DepositFormProps> = ({ onCancel, onSuccess })
             placeholder='0'
           />
         </div>
-
-        {/* <FormikInput
-          name='message'
-          label='Message'
-        /> */}
 
         <div className='mt-10 w-full flex gap-6'>
           <Button

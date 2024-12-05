@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { transferFormValidationSchema } from '../validations/transferFormValidationSchema';
 import { useAccountStore } from '@/modules/account/store/accountStore';
 import { useToast } from '@/hooks/use-toast';
-import { TransferMoneyInput } from '@/modules/account/types';
 
 interface TransferFormProps {
   onCancel: () => void;
@@ -30,10 +29,12 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onCancel, onSuccess 
   );
 
   const onSubmit = async (values: FormikValues) => {
-    const error = await transfer({
+    const body = {
       amount: Number(values.amount),
       toAccountId: values.recipient,
-    } as TransferMoneyInput);
+    };
+
+    const error = await transfer(body);
 
     if (error?.message) {
       showErrorToast(error.message);
@@ -49,7 +50,6 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onCancel, onSuccess 
       initialValues={{
         amount: '',
         recipient: '',
-        message: '',
       }}
       onSubmit={(values) => onSubmit(values)}
     >
@@ -58,7 +58,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onCancel, onSuccess 
           <FormikSelect
             name='recipient'
             options={recipients}
-            label='Select Recipient Account*'
+            label='Select Recipient Account *'
           />
 
           <FormikInput
@@ -69,11 +69,6 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onCancel, onSuccess 
             placeholder='0'
           />
         </div>
-
-        <FormikInput
-          name='message'
-          label='Message'
-        />
 
         <div className='mt-10 w-full flex gap-6'>
           <Button
