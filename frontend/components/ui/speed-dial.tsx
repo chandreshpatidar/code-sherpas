@@ -39,7 +39,7 @@ export default function SpeedDial({ actions, onClick }: SpeedDialProps) {
             className='relative flex items-center group'
           >
             {/* Tooltip */}
-            <span className='absolute right-14 px-2 py-1 bg-white text-gray-700 rounded transition-opacity duration-300'>
+            <span className='absolute right-14 px-2 py-1 bg-white text-gray-700 rounded transition-opacity duration-300 opacity-0 group-hover:opacity-100'>
               {action.label}
             </span>
             {/* Action button */}
