@@ -25,6 +25,13 @@ export type AccountStoreState = {
   resetAccountStore: () => void;
 };
 
+const updateAccountBalance = (accounts: Account[], activeAccountId?: string, balance?: number) => {
+  if (activeAccountId && typeof balance === 'number') {
+    return accounts.map((account) => (account.id === activeAccountId ? { ...account, balance } : account));
+  }
+  return accounts;
+};
+
 export const useAccountStore = create<AccountStoreState>((set, get) => ({
   accounts: [],
   activeAccount: null,
@@ -71,16 +78,21 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
       if (res.error) {
         return res.error as DepositApiError;
       } else {
-        set((state) => ({
-          activeAccount: {
-            ...(state.activeAccount || {}),
-            balance: state.activeAccount?.balance + res.data.amount,
-          } as Account,
-          paginatedTransaction: {
-            ...state.paginatedTransaction,
-            transactions: [res.data, ...state.paginatedTransaction.transactions],
-          },
-        }));
+        set((state) => {
+          const balance = state.activeAccount?.balance + res.data.amount;
+
+          return {
+            activeAccount: {
+              ...(state.activeAccount || {}),
+              balance,
+            } as Account,
+            accounts: updateAccountBalance(state.accounts, state.activeAccount?.id, balance),
+            paginatedTransaction: {
+              ...state.paginatedTransaction,
+              transactions: [res.data, ...state.paginatedTransaction.transactions],
+            },
+          };
+        });
       }
     }
   },
@@ -93,16 +105,21 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
       if (res.error) {
         return res.error as WithdrawApiError;
       } else {
-        set((state) => ({
-          activeAccount: {
-            ...(state.activeAccount || {}),
-            balance: (state.activeAccount?.balance as number) - res.data.amount,
-          } as Account,
-          paginatedTransaction: {
-            ...state.paginatedTransaction,
-            transactions: [res.data, ...state.paginatedTransaction.transactions],
-          },
-        }));
+        set((state) => {
+          const balance = (state.activeAccount?.balance as number) - res.data.amount;
+
+          return {
+            activeAccount: {
+              ...(state.activeAccount || {}),
+              balance,
+            } as Account,
+            accounts: updateAccountBalance(state.accounts, state.activeAccount?.id, balance),
+            paginatedTransaction: {
+              ...state.paginatedTransaction,
+              transactions: [res.data, ...state.paginatedTransaction.transactions],
+            },
+          };
+        });
       }
     }
   },
@@ -115,18 +132,37 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
       if (res.error) {
         return res.error as TransferApiError;
       } else {
-        const transaction = res.data?.find((transactionData: Transaction) => transactionData.type === 'TRANSFER_OUT');
+        const transactionOut = res.data?.find(
+          (transactionData: Transaction) => transactionData.type === 'TRANSFER_OUT'
+        );
 
-        set((state) => ({
-          activeAccount: {
-            ...(state.activeAccount || {}),
-            balance: (state.activeAccount?.balance as number) - res.data.amount,
-          } as Account,
-          paginatedTransaction: {
-            ...state.paginatedTransaction,
-            transactions: [transaction, ...state.paginatedTransaction.transactions],
-          },
-        }));
+        set((state) => {
+          const balance = (state.activeAccount?.balance as number) - transactionOut.amount;
+          const accounts = [...state.accounts];
+
+          res.data?.forEach((transactionData: Transaction) => {
+            const accountIndex = accounts.findIndex((account) => account.id === transactionData.account_id);
+
+            if (accountIndex !== -1) {
+              accounts[accountIndex].balance =
+                transactionData.type === 'TRANSFER_OUT'
+                  ? accounts[accountIndex].balance - transactionData.amount
+                  : accounts[accountIndex].balance + transactionData.amount;
+            }
+          });
+
+          return {
+            accounts,
+            activeAccount: {
+              ...(state.activeAccount || {}),
+              balance,
+            } as Account,
+            paginatedTransaction: {
+              ...state.paginatedTransaction,
+              transactions: [transactionOut, ...state.paginatedTransaction.transactions],
+            },
+          };
+        });
       }
     }
   },
