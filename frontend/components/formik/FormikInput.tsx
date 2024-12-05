@@ -19,9 +19,10 @@ const FormikInput = ({
   return (
     <div className='w-full flex flex-col gap-1.5'>
       <div className='inline-flex gap-1'>
-        <Label className={cn('font-normal text-sm', labelClassName)}>{label}</Label>
+        <Label htmlFor={name} className={cn('font-normal text-sm', labelClassName)}>{label}</Label>
       </div>
       <Input
+        id={name}
         className={cn(meta.touched && meta.error && 'ring-red-200', fieldClassName)}
         type={type}
         placeholder={placeholder}
