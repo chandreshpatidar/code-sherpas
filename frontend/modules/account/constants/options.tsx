@@ -1,34 +1,34 @@
-import { ArrowDownCircle, ArrowUpCircle, MoveHorizontal } from 'lucide-react';
+import { ArrowDownToDot, ChevronsRight, HandCoins } from 'lucide-react';
 
 export const bankingQuickActionOptions = [
   {
     label: 'Deposit',
     icon: (
-      <ArrowDownCircle
+      <ArrowDownToDot
         size={24}
         className='text-green-500'
       />
     ),
-    value: 'deposit',
+    value: 'DEPOSIT',
   },
   {
     label: 'Withdraw',
     icon: (
-      <ArrowUpCircle
+      <HandCoins
         size={24}
         className='text-red-500'
       />
     ),
-    value: 'withdraw',
+    value: 'WITHDRAWAL',
   },
   {
     label: 'Transfer',
     icon: (
-      <MoveHorizontal
+      <ChevronsRight
         size={24}
         className='text-blue-500'
       />
     ),
-    value: 'transfer',
+    value: 'TRANSFER_OUT',
   },
 ];

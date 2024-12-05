@@ -7,9 +7,15 @@ import { WithdrawForm, WithdrawFormDrawer } from '@/modules/withdraw/components'
 import { DepositForm, DepositFormDrawer } from '@/modules/deposit/components';
 import { TransferFormDrawer } from '@/modules/transfer/components/TransformFormDrawer';
 import { TransferForm } from '@/modules/transfer/components/TransferForm';
+import { useAccountStore } from '../store/accountStore';
 
 export const BankingQuickActions = () => {
   const [selected, setSelected] = React.useState<TransactionType | null>(null);
+  const { activeAccount } = useAccountStore();
+
+  if (!activeAccount?.id) {
+    return null;
+  }
 
   return (
     <>
@@ -20,23 +26,32 @@ export const BankingQuickActions = () => {
 
       <DepositFormDrawer
         onClose={() => setSelected(null)}
-        open={selected === 'deposit'}
+        open={selected === 'DEPOSIT'}
       >
-        <DepositForm onCancel={() => setSelected(null)} />
+        <DepositForm
+          onCancel={() => setSelected(null)}
+          onSuccess={() => setSelected(null)}
+        />
       </DepositFormDrawer>
 
       <WithdrawFormDrawer
         onClose={() => setSelected(null)}
-        open={selected === 'withdraw'}
+        open={selected === 'WITHDRAWAL'}
       >
-        <WithdrawForm onCancel={() => setSelected(null)} />
+        <WithdrawForm
+          onCancel={() => setSelected(null)}
+          onSuccess={() => setSelected(null)}
+        />
       </WithdrawFormDrawer>
 
       <TransferFormDrawer
         onClose={() => setSelected(null)}
-        open={selected === 'transfer'}
+        open={selected === 'TRANSFER_OUT'}
       >
-        <TransferForm onCancel={() => setSelected(null)} />
+        <TransferForm
+          onCancel={() => setSelected(null)}
+          onSuccess={() => setSelected(null)}
+        />
       </TransferFormDrawer>
     </>
   );
