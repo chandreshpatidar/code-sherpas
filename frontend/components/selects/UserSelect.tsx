@@ -1,23 +1,29 @@
 'use client';
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useUserStore } from '@/modules/user/store/userStore';
 
 interface UserSelectProps {
   onChange: (value: string) => void;
 }
 
 export const UserSelect: React.FC<UserSelectProps> = ({ onChange }) => {
+  const { users } = useUserStore();
+
   return (
     <Select onValueChange={onChange}>
       <SelectTrigger className='w-full'>
         <SelectValue placeholder='Select a user' />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value='1'>User 1</SelectItem>
-        <SelectItem value='2'>User 2</SelectItem>
-        <SelectItem value='3'>User 3</SelectItem>
-        <SelectItem value='4'>User 4</SelectItem>
-        <SelectItem value='5'>User 5</SelectItem>
+        {users.map((user) => (
+          <SelectItem
+            key={user.id}
+            value={user.id}
+          >
+            {user.name}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );
