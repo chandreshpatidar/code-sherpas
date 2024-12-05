@@ -1,23 +1,29 @@
 'use client';
 import { UserSelect } from '@/components/selects/UserSelect';
+import { useUserStore } from '@/modules/user/store/userStore';
+import { User } from '@/modules/user/types';
 import { setAuthenticatedUser, useAppContext } from '@/store/app';
-import { User } from '@/typedefs';
 import { useRouter } from 'next/navigation';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 export default function SigninPage() {
   const router = useRouter();
   const { dispatch } = useAppContext();
+  const { fetchUsers, users } = useUserStore();
 
   const selectUser = useCallback(
     (value: string) => {
-      const user: User = { id: value, name: 'User ' + value };
+      const user: User = users.find((user) => user.id === value)!;
 
       dispatch(setAuthenticatedUser(user));
       router.replace(`/`);
     },
-    [dispatch, router]
+    [dispatch, router, users]
   );
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <div className='flex justify-center items-center min-h-screen w-screen'>
