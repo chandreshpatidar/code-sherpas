@@ -20,7 +20,12 @@ const FormikSelect = ({
   return (
     <div className='flex flex-col gap-1.5'>
       <div className='inline-flex gap-1'>
-        <Label className={cn('font-normal text-sm', labelClassName)}>{label}</Label>
+        <Label
+          htmlFor={name}
+          className={cn('font-normal text-sm', labelClassName)}
+        >
+          {label}
+        </Label>
       </div>
 
       <Select
@@ -32,7 +37,10 @@ const FormikSelect = ({
         open={open}
         onOpenChange={setOpen}
       >
-        <SelectTrigger className={cn({ 'ring-red-200': meta.touched && meta.error }, className)}>
+        <SelectTrigger
+          id={name}
+          className={cn({ 'ring-red-200': meta.touched && meta.error }, className)}
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent sideOffset={10}>
