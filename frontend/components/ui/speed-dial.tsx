@@ -23,7 +23,7 @@ export default function SpeedDial({ actions, onClick }: SpeedDialProps) {
 
   return (
     <div
-      className='fixed bottom-8 right-8 z-50'
+      className='fixed bottom-4 right-4 z-50'
       onMouseLeave={handleClose}
     >
       {/* Action buttons with tooltips */}
