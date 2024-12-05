@@ -16,6 +16,7 @@ const TransactionItem = ({ type, amount, created_at, balance_after_transaction }
       case 'DEPOSIT':
         return (
           <ArrowDown
+            data-testid='arrow-down-icon'
             className='text-green-500'
             size={18}
           />
@@ -23,6 +24,7 @@ const TransactionItem = ({ type, amount, created_at, balance_after_transaction }
       case 'WITHDRAWAL':
         return (
           <ArrowUp
+            data-testid='arrow-up-icon'
             className='text-red-500'
             size={18}
           />
@@ -30,6 +32,7 @@ const TransactionItem = ({ type, amount, created_at, balance_after_transaction }
       case 'TRANSFER_IN':
         return (
           <MoveDownLeft
+            data-testid='move-down-left-icon'
             className='text-blue-500'
             size={18}
           />
@@ -38,6 +41,7 @@ const TransactionItem = ({ type, amount, created_at, balance_after_transaction }
       case 'TRANSFER_OUT':
         return (
           <MoveUpRight
+            data-testid='move-up-right-icon'
             className='text-blue-500'
             size={18}
           />
