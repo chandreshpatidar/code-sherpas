@@ -1,67 +1,52 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FixedSizeList as List, ListOnScrollProps } from 'react-window';
-import { Transaction } from '../types';
 import TransactionItem from './TransactionItem';
+import { useAccountStore } from '@/modules/account/store/accountStore';
 
 const itemSize = 60;
 const listHeight = 400;
 
 export const PaginatedTransactions = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const { fetchTransactions, paginatedTransaction } = useAccountStore();
 
-  useEffect(() => {
-    fetchTransactions(currentPage);
-  }, [currentPage]);
-
-  const fetchTransactions = async (page: number) => {
-    if (!hasMore || loading) return;
+  const handleScroll = async ({ scrollOffset }: ListOnScrollProps) => {
+    if (loading) return null;
 
     setLoading(true);
-    try {
-      const response = await fetch(`/api/transactions?page=${page}`);
-      const data = await response.json();
-
-      if (data.transactions.length === 0) {
-        setHasMore(false); // No more data
-      } else {
-        setTransactions((prev) => [...prev, ...data.transactions]);
-      }
-    } catch (error) {
-      console.error('Error fetching transactions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleScroll = ({ scrollOffset }: ListOnScrollProps) => {
-    const threshold = transactions.length * itemSize - listHeight;
+    const threshold = paginatedTransaction.transactions.length * itemSize - listHeight;
     // Check if the user has scrolled near the bottom (100px buffer)
-    if (scrollOffset >= threshold - 100 && !loading && hasMore) {
-      setCurrentPage((prev) => prev + 1);
+    if (scrollOffset >= threshold - 100 && paginatedTransaction.nextCursor) {
+      await fetchTransactions(15, { cursor: paginatedTransaction.nextCursor });
     }
+    setLoading(false);
   };
 
   return (
     <div>
+      <div className='grid grid-cols-[minmax(100px,1fr)_1fr_1fr] items-center gap-2 md:gap-4 p-3 mb-1 text-gray-100 font-semibold text-sm'>
+        <div>Date</div>
+        <div>Amount</div>
+        <div className='text-end'>Balance</div>
+      </div>
+
       <List
         height={400}
-        itemCount={transactions.length}
-        itemSize={60}
+        itemCount={paginatedTransaction.transactions.length}
+        itemSize={52}
         width='100%'
         onScroll={handleScroll}
+        className='scrollbar'
       >
         {({ index, style }) => {
-          const transaction = transactions[index];
+          const transaction = paginatedTransaction.transactions?.[index];
           return (
             <div style={style}>
               <TransactionItem
                 amount={transaction.amount}
-                balance={transaction.balance}
-                date={transaction.date}
+                balance_after_transaction={transaction.balance_after_transaction}
+                created_at={transaction.created_at}
                 type={transaction.type}
               />
             </div>
