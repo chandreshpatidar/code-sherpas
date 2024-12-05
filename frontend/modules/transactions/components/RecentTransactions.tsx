@@ -1,41 +1,64 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import TransactionItem, { TransactionItemProps } from './TransactionItem';
-
-const transactions: TransactionItemProps[] = [
-  { type: 'deposit', amount: 250, date: 'Aug 20, 2024', balance: 5000 },
-  { type: 'withdraw', amount: 50, date: 'Aug 18, 2024', balance: 5000 },
-  { type: 'transfer', amount: 100, date: 'Aug 17, 2024', balance: 5000 },
-];
+import TransactionItem from './TransactionItem';
+import { useAccountStore } from '@/modules/account/store/accountStore';
+import { cn } from '@/lib/utils';
 
 export const RecentTransactions = () => {
+  const { activeAccount, paginatedTransaction, fetchTransactions } = useAccountStore();
+
+  useEffect(() => {
+    if (activeAccount?.id) {
+      fetchTransactions(15, { refetch: true });
+    }
+  }, [activeAccount?.id]);
+
   return (
-    <Card className='flex-1 max-h-[500px] overflow-y-auto scrollbar'>
+    <Card
+      className={cn('flex-1 max-h-[500px] overflow-y-auto scrollbar transition-all', {
+        'opacity-40': !activeAccount?.id,
+        'opacity-100': activeAccount?.id,
+      })}
+    >
       <CardHeader>
         <CardTitle>Recent Transactions</CardTitle>
       </CardHeader>
-      <CardContent>
-        {transactions.map((transaction, index) => (
-          <TransactionItem
-            key={index}
-            {...transaction}
-          />
-        ))}
+      <CardContent className=''>
+        {!activeAccount?.id ? (
+          <p className='text-center text-muted-foreground'>Please select an account</p>
+        ) : (
+          <>
+            <div className='grid grid-cols-[minmax(100px,1fr)_1fr_1fr] items-center gap-2 md:gap-4 p-3 mb-1 text-gray-100 font-semibold text-sm'>
+              <div>Date</div>
+              <div>Amount</div>
+              <div className='text-end'>Balance</div>
+            </div>
+
+            {paginatedTransaction.transactions?.slice(0, 5)?.map((transaction, index) => (
+              <TransactionItem
+                key={index}
+                {...transaction}
+              />
+            ))}
+          </>
+        )}
       </CardContent>
-      <CardFooter className='justify-start'>
-        <Link
-          href='/transactions'
-          className='flex items-center gap-4'
-        >
-          <Button variant='secondary'>
-            View all <ArrowRight size={20} />
-          </Button>
-        </Link>
-      </CardFooter>
+      {!!activeAccount?.id && paginatedTransaction.transactions?.length > 5 && (
+        <CardFooter className='justify-start'>
+          <Link
+            href='/transactions'
+            className='flex items-center gap-4'
+          >
+            <Button variant='secondary'>
+              View all <ArrowRight size={20} />
+            </Button>
+          </Link>
+        </CardFooter>
+      )}
     </Card>
   );
 };

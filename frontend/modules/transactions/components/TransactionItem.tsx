@@ -1,36 +1,45 @@
-import { ArrowDownCircle, ArrowUpCircle, MoveHorizontal } from 'lucide-react';
+import { ArrowDown, ArrowUp, MoveDownLeft, MoveUpRight } from 'lucide-react';
 import { TransactionType } from '../types';
 import { useMemo } from 'react';
+import dayjs from 'dayjs';
 
 export interface TransactionItemProps {
   type: TransactionType;
   amount: number;
-  date: string;
-  balance: number;
+  created_at: string;
+  balance_after_transaction: number;
 }
 
-const TransactionItem = ({ type, amount, date, balance }: TransactionItemProps) => {
+const TransactionItem = ({ type, amount, created_at, balance_after_transaction }: TransactionItemProps) => {
   const icon = useMemo(() => {
     switch (type) {
-      case 'deposit':
+      case 'DEPOSIT':
         return (
-          <ArrowDownCircle
+          <ArrowDown
             className='text-green-500'
-            size={24}
+            size={18}
           />
         );
-      case 'withdraw':
+      case 'WITHDRAWAL':
         return (
-          <ArrowUpCircle
+          <ArrowUp
             className='text-red-500'
-            size={24}
+            size={18}
           />
         );
-      case 'transfer':
+      case 'TRANSFER_IN':
         return (
-          <MoveHorizontal
+          <MoveDownLeft
             className='text-blue-500'
-            size={24}
+            size={18}
+          />
+        );
+
+      case 'TRANSFER_OUT':
+        return (
+          <MoveUpRight
+            className='text-blue-500'
+            size={18}
           />
         );
       default:
@@ -39,20 +48,15 @@ const TransactionItem = ({ type, amount, date, balance }: TransactionItemProps) 
   }, [type]);
 
   return (
-    <div className='flex items-center bg-white dark:bg-gray-800 shadow-md rounded-lg gap-2 md:gap-4 p-3 md:p-4 mb-0.5'>
-      <div className='flex-shrink-0'>{icon}</div>
-      <div className='flex-grow'>
-        <label className='text-sm text-gray-100'>{date}</label>
+    <div className='grid grid-cols-[minmax(100px,1fr)_1fr_1fr] items-center bg-white dark:bg-gray-800 shadow-md rounded-lg gap-2 md:gap-4 p-3 mb-1'>
+      <div>
+        <label className='text-sm text-gray-100'>{dayjs(created_at).format('DD/MM/YYYY')}</label>
       </div>
-      <div className='flex-shrink-0 flex-grow'>
-        <label className='text-sm text-gray-400'>
-          {type === 'deposit' ? '+ ' : '- '}
-          {amount}
-        </label>
+      <div className='flex items-center gap-2  text-sm text-gray-400'>
+        {icon}
+        {amount}
       </div>
-      <div className='flex-shrink-0'>
-        <label className='text-sm text-gray-400 font-medium'>{balance}</label>
-      </div>
+      <div className='text-sm text-gray-400 font-medium text-end self-end'>{balance_after_transaction}</div>
     </div>
   );
 };
