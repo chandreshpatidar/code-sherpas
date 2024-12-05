@@ -1,36 +1,57 @@
 'use client';
 import React from 'react';
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikValues } from 'formik';
 import FormikInput from '@/components/formik/FormikInput';
 import { Button } from '@/components/ui/button';
 import { depositFormValidationSchema } from '../validations/depositFormValidationSchema';
+import { useAccountStore } from '@/modules/account/store/accountStore';
+import { DepositMoneyInput } from '@/modules/account/types';
+import { useToast } from '@/hooks/use-toast';
 
 interface DepositFormProps {
   onCancel: () => void;
+  onSuccess?: () => void;
 }
 
-export const DepositForm: React.FC<DepositFormProps> = ({ onCancel }) => {
+export const DepositForm: React.FC<DepositFormProps> = ({ onCancel, onSuccess }) => {
+  const { deposit } = useAccountStore();
+  const { showSuccessToast, showErrorToast } = useToast();
+
+  const onSubmit = async (values: FormikValues) => {
+    const error = await deposit({ amount: Number(values.amount) } as DepositMoneyInput);
+
+    if (error?.message) {
+      showErrorToast(error.message);
+    } else {
+      showSuccessToast('Deposit successful');
+      onSuccess?.();
+    }
+  };
+
   return (
     <Formik
       validationSchema={depositFormValidationSchema}
       initialValues={{
-        amount: 0,
-        message: '',
+        amount: '',
+        // message: '',
       }}
-      onSubmit={(values) => console.log(values)}
+      onSubmit={(values) => onSubmit(values)}
     >
       <Form className='flex flex-col gap-4 w-full'>
         <div className='grid grid-cols-1 gap-4'>
           <FormikInput
             name='amount'
             label='Amount *'
+            type='number'
+            min={0}
+            placeholder='0'
           />
         </div>
 
-        <FormikInput
+        {/* <FormikInput
           name='message'
           label='Message'
-        />
+        /> */}
 
         <div className='mt-10 w-full flex gap-6'>
           <Button
