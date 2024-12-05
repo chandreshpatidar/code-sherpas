@@ -1,4 +1,4 @@
-import { User } from '@/typedefs';
+import { User } from '@/modules/user/types';
 import { PropsWithChildren } from 'react';
 
 export interface AppContextState {

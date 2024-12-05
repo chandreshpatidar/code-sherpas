@@ -1,8 +1,9 @@
 'use client';
 
-import { createContext, useContext, useReducer, Dispatch, useMemo } from 'react';
+import { createContext, useContext, useReducer, Dispatch, useMemo, useEffect } from 'react';
 import initialAppContextState, { AppContextReducer } from './reducer';
 import { AppContextProviderProps, AppContextState, AppContextAction } from './types';
+import { useRouter } from 'next/navigation';
 
 const AppContext = createContext<
   | {
@@ -13,6 +14,7 @@ const AppContext = createContext<
 >(undefined);
 
 export const AppContextProvider = ({ children }: AppContextProviderProps) => {
+  const router = useRouter();
   const [state, dispatch] = useReducer(AppContextReducer, initialAppContextState);
 
   const value = useMemo(
@@ -22,6 +24,12 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
     }),
     [state]
   );
+
+  useEffect(() => {
+    if (state.user?.id === undefined) {
+      router.replace('/sign-in');
+    }
+  }, [state.user?.id]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
