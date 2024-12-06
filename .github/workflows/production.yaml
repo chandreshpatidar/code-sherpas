@@ -44,6 +44,10 @@ jobs:
         working-directory: ./backend
         run: pnpm install
 
+      - name: Generate Prisma Types
+        working-directory: ./backend
+        run: npx prisma generate
+
       - name: Run Test Suite
         working-directory: ./backend
         run: pnpm test
