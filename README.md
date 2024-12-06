@@ -4,12 +4,18 @@ A full-stack banking application built with **Next.js** (frontend), **Nest.js** 
 
 ## **Table of Contents**
 
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Project Structure](#project-structure)
-- [Setup Instructions](#setup-instructions)
-- [Decisions and Design Choices](#decisions-and-design-choices)
-- [API Endpoints](#api-endpoints)
+- [**Banking Application**](#banking-application)
+  - [**Table of Contents**](#table-of-contents)
+  - [**Features**](#features)
+  - [**Technologies Used**](#technologies-used)
+  - [**Project Structure**](#project-structure)
+  - [**Setup Instructions**](#setup-instructions)
+    - [Prerequisites](#prerequisites)
+    - [Steps to Run the Project](#steps-to-run-the-project)
+  - [**Decisions and Design Choices**](#decisions-and-design-choices)
+  - [**Key API Endpoints**](#key-api-endpoints)
+    - [**Accounts**](#accounts)
+    - [**Transactions**](#transactions)
 
 ---
 
@@ -32,6 +38,7 @@ A full-stack banking application built with **Next.js** (frontend), **Nest.js** 
 - **Containerization:** Docker + Docker Compose
 - **Authentication:** (Currently not implemented)
 - **API Documentation:** Swagger UI
+- **Tailwind CSS:** CSS Framework
 
 ---
 
@@ -45,6 +52,13 @@ A full-stack banking application built with **Next.js** (frontend), **Nest.js** 
 │   │   ├── main.ts  # Entry point for the backend
 │   └── prisma/      # Prisma schema and migrations
 ├── frontend/        # Frontend code (Next.js)
+│   ├── app/         # App directory based router
+│   ├── components/  # Reusable components (ui, formik, selects, layout)
+│   ├── hooks/       # Global hooks
+│   ├── lib/         # Shared Utililt and api config 
+│   ├── modules/     # Modules for account, user, deposit, transfer, withdrawal
+│   ├── public/      # Static and public assets
+│   ├── store/       # Shared global store
 ├── docker-compose.yml # Docker Compose file for orchestrating services
 └── README.md        # Project documentation
 ```
@@ -110,9 +124,19 @@ A full-stack banking application built with **Next.js** (frontend), **Nest.js** 
 
    - Provides self-documenting API for easy testing and onboarding.
 
-5. **Uni tests:**
+5. **Unit tests:**
    - Only covering the business logic to transfer the amount from one account to another account.
    - All APIs except transfer don't have much business logic hence don't have unit tests
+   - On the frontend, test cases have been added only for Formik components and a conditional rendering component (Transaction Item) to validate specific conditions.
+
+6. **User Authentication**
+   - For now, user authentication has not been fully implemented. You can select a user from the dropdown to simulate user authentication. If no active user is set in the store, the application will redirect to the sign-in route.
+
+7. **API Integration**
+   - Axios has been used for API integration on the frontend.
+
+8. **State Management**
+   - The **Context API** is used for managing minimal state changes, while **Zustand** is utilized for extensive state updates and handling asynchronous API calls. Zustand offers optimized performance compared to the Context API, as it only re-renders components that directly consume the store.
 
 ---
 
