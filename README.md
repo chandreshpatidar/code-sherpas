@@ -13,6 +13,7 @@ A full-stack banking application built with **Next.js** (frontend), **Nest.js** 
     - [Prerequisites](#prerequisites)
     - [Steps to Run the Project](#steps-to-run-the-project)
   - [**Decisions and Design Choices**](#decisions-and-design-choices)
+  - [**Nice to have additions**](#nice-to-have-additions)
   - [**Key API Endpoints**](#key-api-endpoints)
     - [**Accounts**](#accounts)
     - [**Transactions**](#transactions)
@@ -138,6 +139,13 @@ A full-stack banking application built with **Next.js** (frontend), **Nest.js** 
 8. **State Management**
    - The **Context API** is used for managing minimal state changes, while **Zustand** is utilized for extensive state updates and handling asynchronous API calls. Zustand offers optimized performance compared to the Context API, as it only re-renders components that directly consume the store.
 
+---
+
+## **Nice to have additions**
+
+   - Pre-selecting first account on selecting the user from the landing page
+   - Showing skeleton loader for Recent transactions table
+   - Managing loading state for deposit, withdraw, and transfer operations
 ---
 
 ## **Key API Endpoints**
