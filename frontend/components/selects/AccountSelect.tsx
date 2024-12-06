@@ -1,11 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useAppContext } from '@/store/app';
 import { useAccountStore } from '@/modules/account/store/accountStore';
 
 export const AccountSelect = () => {
   const { state } = useAppContext();
-  const { fetchUserAccounts, setActiveAccount, activeAccount, accounts } = useAccountStore();
+  const { fetchAccounts: fetchUserAccounts, setActiveAccount, activeAccount, accounts } = useAccountStore();
+
+  const userAccounts = useMemo(
+    () => accounts?.filter((account) => account.owner.id === state.user?.id),
+    [accounts, state.user?.id]
+  );
 
   const onValueChange = (id: string) => {
     const account = accounts.find((account) => account.id === id)!;
@@ -28,7 +33,7 @@ export const AccountSelect = () => {
         <SelectValue placeholder='Select an account' />
       </SelectTrigger>
       <SelectContent>
-        {accounts.map((account) => (
+        {userAccounts.map((account) => (
           <SelectItem
             key={account.id}
             value={account.id}

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { depositMoney, fetchAccounts, transferMoney, withdrawMoney } from '../services';
+import { depositMoney, fetchAccounts as fetchAccountsService, transferMoney, withdrawMoney } from '../services';
 import {
   Account,
   DepositApiError,
@@ -17,7 +17,7 @@ export type AccountStoreState = {
   activeAccount: Account | null;
   paginatedTransaction: { transactions: Transaction[]; nextCursor?: string };
   setActiveAccount: (account: Account | null) => void;
-  fetchUserAccounts: (userId: string) => Promise<void>;
+  fetchAccounts: (userId: string) => Promise<void>;
   fetchTransactions: (limit: number, options?: { refetch?: boolean; cursor?: string }) => Promise<void>;
   deposit: (body: DepositMoneyInput) => Promise<DepositApiError | void>;
   withdraw: (body: WithdrawMoneyInput) => Promise<WithdrawApiError | void>;
@@ -39,14 +39,13 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
   setActiveAccount: (account: Account | null) => {
     set({ activeAccount: account });
   },
-  fetchUserAccounts: async (userId: string) => {
-    const res = await fetchAccounts();
+  fetchAccounts: async () => {
+    const res = await fetchAccountsService();
 
     if (res.error) {
       set({ accounts: [] });
     } else {
-      const userAccounts = res.data?.filter((account: Account) => account.owner.id === userId);
-      set({ accounts: userAccounts });
+      set({ accounts: res.data || [] });
     }
   },
   fetchTransactions: async (limit: number, options?: { refetch?: boolean; cursor?: string }) => {
