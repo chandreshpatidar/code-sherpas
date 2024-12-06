@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { depositMoney, fetchAccountsByUserId, transferMoney, withdrawMoney } from '../services';
+import { depositMoney, fetchAccounts, transferMoney, withdrawMoney } from '../services';
 import {
   Account,
   DepositApiError,
@@ -40,7 +40,7 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
     set({ activeAccount: account });
   },
   fetchUserAccounts: async (userId: string) => {
-    const res = await fetchAccountsByUserId(userId);
+    const res = await fetchAccounts();
 
     if (res.error) {
       set({ accounts: [] });

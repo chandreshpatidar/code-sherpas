@@ -1,4 +1,4 @@
-import { User } from '@/typedefs';
+import { User } from '@/modules/user/types';
 
 export const ActionTypes = {
   RESET_STORE: 'RESET_STORE',

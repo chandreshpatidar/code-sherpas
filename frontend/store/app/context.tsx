@@ -4,6 +4,8 @@ import { createContext, useContext, useReducer, Dispatch, useMemo, useEffect } f
 import initialAppContextState, { AppContextReducer } from './reducer';
 import { AppContextProviderProps, AppContextState, AppContextAction } from './types';
 import { useRouter } from 'next/navigation';
+import Layout from '@/components/layout/Layout';
+import { BankingQuickActions } from '@/modules/account/components';
 
 const AppContext = createContext<
   | {
@@ -31,7 +33,18 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
     }
   }, [state.user?.id]);
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={value}>
+      {state.user?.id ? (
+        <Layout>
+          <BankingQuickActions />
+          {children}
+        </Layout>
+      ) : (
+        children
+      )}
+    </AppContext.Provider>
+  );
 };
 
 export const useAppContext = () => {

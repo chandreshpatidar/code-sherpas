@@ -1,4 +1,4 @@
-import axiosInstance from '@/api/axiosConfig';
+import axiosInstance from '@/lib/api/axiosConfig';
 import {
   DepositApiError,
   DepositMoneyInput,
@@ -7,9 +7,9 @@ import {
   WithdrawApiError,
   WithdrawMoneyInput,
 } from '../types';
-import handleApiError from '@/api/handleApiError';
+import handleApiError from '@/lib/api/handleApiError';
 
-export const fetchAccountsByUserId = async (userId: string) => {
+export const fetchAccounts = async () => {
   try {
     const res = await axiosInstance.get('/accounts');
 

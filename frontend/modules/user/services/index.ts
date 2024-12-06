@@ -1,5 +1,5 @@
-import axiosInstance from '@/api/axiosConfig';
-import handleApiError from '@/api/handleApiError';
+import axiosInstance from '@/lib/api/axiosConfig';
+import handleApiError from '@/lib/api/handleApiError';
 
 export const fetchUsers = async () => {
   try {
