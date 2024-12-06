@@ -1,0 +1,118 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/*.yaml"
+
+env:
+  project_number: "536980932404"
+  project_id: "test-project-02024"
+  region: "asia-south1"
+  artifact_registry: "test-artifacts/bank-simulation"
+  service_account: github-actions@test-project-02024.iam.gserviceaccount.com
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "pnpm"
+          cache-dependency-path: backend/pnpm-lock.yaml
+
+      - name: Install Dependencies
+        working-directory: ./backend
+        run: pnpm install
+
+      - name: Run Test Suite
+        working-directory: ./backend
+        run: pnpm test
+
+  dockerize:
+    name: Dockerize Backend
+    runs-on: ubuntu-latest
+    needs: test
+
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: /gcp_credentials.json
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: "google-github-actions/auth@v1"
+        with:
+          workload_identity_provider: projects/${{ env.project_number }}/locations/global/workloadIdentityPools/ga-pool/providers/ga-pool
+          service_account: ${{ env.service_account }}
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker ${{ env.region }}-docker.pkg.dev
+
+      - name: Build docker image
+        run: |
+          cd backend & docker build ./backend -t ${{ env.region }}-docker.pkg.dev/${{ env.project_id }}/${{ env.artifact_registry }}
+
+      - name: Push to Artifact Registry
+        run: |
+          docker push ${{ env.region }}-docker.pkg.dev/${{ env.project_id }}/${{ env.artifact_registry }}
+
+  deploy:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: dockerize
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: "google-github-actions/auth@v1"
+        with:
+          workload_identity_provider: projects/${{ env.project_number }}/locations/global/workloadIdentityPools/ga-pool/providers/ga-pool
+          service_account: ${{ env.service_account }}
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker ${{ env.region }}-docker.pkg.dev
+
+      - name: Deploy to cloud run
+        id: "deploy_cloud_run"
+        uses: "google-github-actions/deploy-cloudrun@v1"
+        with:
+          service: "bank-simulation"
+          image: "${{ env.region }}-docker.pkg.dev/${{ env.project_id }}/${{ env.artifact_registry }}"
+
+      - name: "Use output"
+        run: 'curl "${{ steps.deploy_cloud_run.outputs.url }}"'
