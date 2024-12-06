@@ -39,6 +39,7 @@ export const DepositForm: React.FC<DepositFormProps> = ({ onCancel, onSuccess })
       <Form className='flex flex-col gap-4 w-full'>
         <div className='grid grid-cols-1 gap-4'>
           <FormikInput
+            autoFocus
             name='amount'
             label='Amount *'
             type='number'

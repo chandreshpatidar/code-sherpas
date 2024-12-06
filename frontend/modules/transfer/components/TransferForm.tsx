@@ -56,6 +56,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onCancel, onSuccess 
       <Form className='flex flex-col gap-4 w-full'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <FormikSelect
+            autoFocus
             name='recipient'
             options={recipients}
             label='Select Recipient Account *'

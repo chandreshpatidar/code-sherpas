@@ -12,6 +12,7 @@ const FormikSelect = ({
   className,
   label,
   labelClassName,
+  autoFocus,
   disabled = false,
 }: FormikSelectProps) => {
   const [open, setOpen] = useState(false);
@@ -38,6 +39,7 @@ const FormikSelect = ({
         onOpenChange={setOpen}
       >
         <SelectTrigger
+          autoFocus={autoFocus}
           id={name}
           className={cn({ 'ring-red-200': meta.touched && meta.error }, className)}
         >

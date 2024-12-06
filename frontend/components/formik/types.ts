@@ -21,6 +21,7 @@ export interface FormikSelectProps {
   labelClassName?: string;
   disabled?: boolean;
   hintText?: string;
+  autoFocus?: boolean;
 }
 
 export interface SelectOptions {
